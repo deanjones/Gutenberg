@@ -267,3 +267,8 @@ def load_metadata(refresh_cache=False):
         cache.open()
 
     return cache.graph
+
+
+if __name__ == '__main__':
+    cache = SleepycatMetadataCache('/Users/deanjones/gutenberg_data')
+    cache.populate()

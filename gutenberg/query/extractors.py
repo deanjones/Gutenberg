@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 from rdflib.term import Literal
 from rdflib.term import URIRef
+from rdflib import RDF
 
 from gutenberg._domain_model.vocabulary import DCTERMS
 from gutenberg._domain_model.vocabulary import PGTERMS
@@ -33,6 +34,8 @@ class _SimplePredicateRelationshipExtractor(MetadataExtractor):
 
     @classmethod
     def get_etexts(cls, requested_value):
+        print cls.predicate()
+        print cls.contains(requested_value)
         query = cls._metadata()[:cls.predicate():cls.contains(requested_value)]
         return frozenset(cls._uri_to_etext(result) for result in query)
 
@@ -86,3 +89,32 @@ class FormatURIExtractor(_SimplePredicateRelationshipExtractor):
     @classmethod
     def contains(cls, value):
         return URIRef(value)
+
+
+class LanguageExtractor(_SimplePredicateRelationshipExtractor):
+    """Extracts book languages.
+
+    """
+    @classmethod
+    def feature_name(cls):
+        return 'language'
+
+    @classmethod
+    def predicate(cls):
+        return DCTERMS.language / RDF.value
+
+    @classmethod
+    def contains(cls, value):
+        return Literal(value)
+
+
+if __name__ == '__main__':
+    from gutenberg.acquire.metadata import set_metadata_cache, SleepycatMetadataCache
+    cache = SleepycatMetadataCache('/Users/deanjones/gutenberg_data')
+    set_metadata_cache(cache)
+
+    from gutenberg.query import get_etexts
+    # texts = gutenberg.query.api.get_etexts('language', 'en')
+    # print len(texts)
+
+    print get_etexts('language', 'en')
